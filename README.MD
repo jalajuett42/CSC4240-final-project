@@ -59,3 +59,7 @@ The final project grade will be distributed as follows:
 3. push your changes to dev
 4. resolve conflicts
 5. delete your branch and repeat steps 1-5
+
+### Ideas
+1. Perform sentiment analysis to help reciever interpret the tone of an email
+2. Perform sentiment analysis to help sender write an email with appropriate tone/ make suggestions
