@@ -52,3 +52,10 @@ The final project grade will be distributed as follows:
 
 3. **Final Presentation** (In class, week of Dec 2)  
    Your final presentation should summarize your work to your classmates. The instructor(s) and other students will contribute to the evaluation of the final presentations. The date and schedule of the final presentations will be announced later.
+
+### Workflow
+1. Create a branch from dev
+2. make your changes on your branch
+3. push your changes to dev
+4. resolve conflicts
+5. delete your branch and repeat steps 1-5
