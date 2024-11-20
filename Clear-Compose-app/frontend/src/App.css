@@ -1,0 +1,62 @@
+/* For repeated classnames (multiple components with same styles)*/
+
+.nav-link {
+  @apply hover:text-gray-400 text-white font-sans;
+}
+
+.nav-icon {
+  @apply h-6 w-6 mr-4 ml-4;
+}
+
+.pill-container {
+  @apply rounded-2xl flex px-4 py-2 shadow-md mr-8 bg-blue-300;
+}
+
+.pill-title {
+  @apply text-lg font-bold pb-1;
+}
+
+.loader {
+  border: 4px solid rgba(150, 150, 150, 0.2);
+  border-left-color: #4f46e5; /* Adjust color to match your theme */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+.scale-out {
+  animation: scaleOut 0.2s ease-in forwards;
+}
