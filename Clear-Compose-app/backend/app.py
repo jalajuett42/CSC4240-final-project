@@ -27,16 +27,19 @@ def sentiment_analysis():
 @app.route("/generate", methods=["GET"])
 def generate():
 	sentence = request.args.get("sentence")
+	sender = request.args.get("sender")
+	recipient = request.args.get("recipient")
+	
 	chat_completion = client.chat.completions.create(
 		messages=[
 			{
 			    "role": "user",
-			    "content": "You will be given a sentence that has been detected to have an overly negative tone. Provide three rewordings of the sentence with more neutral or positive sentiments, while preserving the meaning of the original. Do not respond with anything besides the three rewordings, split by a single newline.\n\n" + sentence
+			    "content": "You are a " + sender + " emailing your " + recipient + ". You will be given a sentence that has been detected to have an overly negative tone. Provide three rewordings of the sentence with more neutral or positive sentiments, while preserving the meaning of the original. Split the three responses with a single newline.\n\n" + sentence
 			}
 		],
 		model="llama3-8b-8192",
 	)
-	return chat_completion.choices[0].message.content.split('\n')[2:5] # hardcoded indexes since it wastes 2 lines saying "here's some alternate phrasings\n"
+	return chat_completion.choices[0].message.content.split('\n')[::2]
 	
 
 if __name__ == "__main__":
