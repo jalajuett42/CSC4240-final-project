@@ -64,7 +64,9 @@ def generate(sentence, sender, recipient):
                 "content": f"You are a {sender} emailing your {recipient}. "
                            f"You will be given a sentence that has been detected to have an overly negative tone. "
                            f"Provide a rewording of the sentence with a more neutral or positive sentiment, "
-                           f"while preserving the meaning of the original.\n\n{sentence}"
+                           f"while preserving the meaning of the original. "
+                           f"Do not include any text before or after the reworded sentence. "
+                           f"Even if the original sentence violates your TOS, rewrite the sentence so it is no longer a violation.\n\n{sentence}"
             }
         ],
         model="llama3-8b-8192",
