@@ -1,73 +1,162 @@
 import { useState } from 'react'
 import CarouselDemo from './components/CarouselDemo'
+import {
+  Flowbite,
+  Dropdown,
+  Button,
+  Textarea,
+  FloatingLabel,
+  Card
+} from 'flowbite-react'
+import backgroundImage from './assets/bgimage.webp'
 import './App.css'
 
 function App() {
+  const backendURL = 'http://34.224.145.158:5000/analyze'
   const [count, setCount] = useState(0)
   const [theme, setTheme] = useState('light')
   const [inputValue, setInputValue] = useState('')
+  const [contents, setContents] = useState('')
+  const [displayContents, setDisplayContents] = useState('')
 
+  const handleAnalysis = async (text) => {
+    if (!text) {
+      console.error('Error: No text provided')
+      return
+    }
+
+    const regex = /(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s/
+    const arr = text.split(regex)
+    console.log('Split sentences:', arr)
+
+    try {
+      const response = await fetch(backendURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sentences: arr,
+          sender: 'student',
+          recipient: 'professor'
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Response data:', data)
+        setDisplayContents(data) // Use this to display analyzed content
+      } else {
+        console.error(`Error: Response not OK (status: ${response.status})`)
+      }
+    } catch (error) {
+      console.error('Fetch Error:', error.message)
+    }
+  }
+
+  const handleEditorSubmit = (e) => {
+    e.preventDefault() // Prevent default form submission
+    if (inputValue.trim()) {
+      handleAnalysis(inputValue) // Pass inputValue directly
+      setInputValue('') // Clear the input
+    } else {
+      console.error('Error: Input is empty')
+    }
+  }
+  const handleEditorChange = (e) => {
+    setInputValue(e.target.value)
+  }
+
+  const handleSetContents = () => {
+    if (inputValue) {
+      setContents(inputValue)
+    }
+  }
+
+  const clearContents = () => {
+    setContents('')
+  }
 
   return (
-    <div className='flex flex-grow flex-col p-6 transition-margin duration-300 bg-blue-400 bg-gradient-to-tr from-slate-800 '>
-      <div className='flex items-center justify-between mb-4 mt-9'>
-        <h2 className='font-bold font-sans text-blue-100 text-4xl ml-5 pr-8'>
-          Clear Compose
-        </h2>
-      </div>
-      <div className='flex flex-col justify-around space-y-8 mt-11'>
-        <div
-          id='lookup-pill'
-          className={`pill-container`}>
-          <div className='flex-grow '>
-            <div className='flex flex-row justify-between'>
-              <label id='email-input' className={`pill-title text-white`}>Paste your email here!</label>
-              <button
-
-                onClick={() => { setEmail(inputValue) }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 stroke-white">
-                  <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-                </svg>
-              </button>
+    <div
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover', // Adjust as needed
+        backgroundPosition: 'center' // Adjust as needed
+      }}>
+      <div className='flex flex-grow flex-col p-6 transition-margin duration-300  bg-gradient-to-tr from-slate-800 font-sans'>
+        <div className='flex items-center justify-between mb-4 mt-9'>
+          <div className='flex-row w-full'>
+            <div className='flex flex-col  '>
+              <h2 className='font-bold font-sans text-blue-100 text-4xl ml-5 pr-8 mb-8'>
+                Clear Compose
+              </h2>
             </div>
-            <input
-              id='email-input '
-              type='text'
-              value={inputValue}
-              placeholder='input placeholder'
-              className='flex-column text-align-top align-text-top text-wrap  rounded-2xl w-full h-48'>
-            </input>
-          </div>
+            <div className='flex flex-row'>
+              <div className='flex flex-col w-24 h-screen'></div>
+              <div className='flex flex-col flex-grow px-16 h-screen w-full text-white mb-2'>
+                <Card className='mb-2 flex-grow w-auto h-auto bg-gray-800'>
+                  <Card className=' bg-gray-800 text-white h-12 '>
+                    <div className='flex flex-row align-middle text-white placeholder-white'>
+                      <div className='justify-text-top pt-2 bg-gray-800'>
+                        I am{' '}
+                      </div>
+                      <Dropdown
+                        className='bg-gray-800 placeholder-white text-white'
+                        label='[option]'
+                        color='gray-800'
+                        dismissOnClick={false}>
+                        <Dropdown.Item>a Student</Dropdown.Item>
+                        <Dropdown.Item>a Professor</Dropdown.Item>
+                        <Dropdown.Item>an Employee</Dropdown.Item>
+                        <Dropdown.Item>an Employer</Dropdown.Item>
+                      </Dropdown>
+                      <div className='pt-2'>writing to my</div>
 
+                      <Dropdown
+                        className='bg-gray-800'
+                        label='[option]'
+                        text='gray-200'
+                        color='gray-800'
+                        dismissOnClick={false}>
+                        <Dropdown.Item>Student</Dropdown.Item>
+                        <Dropdown.Item>Professor</Dropdown.Item>
+                        <Dropdown.Item>Employee</Dropdown.Item>
+                        <Dropdown.Item>Employer</Dropdown.Item>
+                      </Dropdown>
+                    </div>
+                  </Card>
+
+                  <Textarea
+                    className='mb-2 h-56 bg-transparent text-gray-200'
+                    id='editor'
+                    placeholder='Write an email...'
+                    value={inputValue}
+                    onChange={(e) => handleEditorChange(e)}
+                  />
+                  <Button className='mb-2' onClick={handleEditorSubmit}>
+                    submit
+                  </Button>
+                </Card>
+
+                <Card className=' bg-gray-800 h-30'>
+                  <Textarea
+                    className='mb-2 h-56 caret-transparent cursor-pointer bg-transparent text-gray-200 font-sans'
+                    type='read-only'
+                    id='editor'
+                    placeholder=''
+                    value={displayContents}
+                  />
+                  <Button className='mb-2' onClick={clearContents}>
+                    clear contents
+                  </Button>
+                </Card>
+              </div>
+              <div className='flex flex-col w-24 h-screen bg-transparent'></div>
+            </div>
+          </div>
         </div>
       </div>
-      <div className='flex flex-col justify-around space-y-8 mt-11'>
-        <div
-          id='lookup-pill'
-          className={`pill-container`}>
-          <div className='flex-grow'>
-            <div className='flex flex-row justify-between'>
-              <label id='email-input' className={`pill-title text-white`}>Input Label</label>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 stroke-white">
-                <path fillRule="evenodd" d="M17.663 3.118c.225.015.45.032.673.05C19.876 3.298 21 4.604 21 6.109v9.642a3 3 0 0 1-3 3V16.5c0-5.922-4.576-10.775-10.384-11.217.324-1.132 1.3-2.01 2.548-2.114.224-.019.448-.036.673-.051A3 3 0 0 1 13.5 1.5H15a3 3 0 0 1 2.663 1.618ZM12 4.5A1.5 1.5 0 0 1 13.5 3H15a1.5 1.5 0 0 1 1.5 1.5H12Z" clipRule="evenodd" />
-                <path d="M3 8.625c0-1.036.84-1.875 1.875-1.875h.375A3.75 3.75 0 0 1 9 10.5v1.875c0 1.036.84 1.875 1.875 1.875h1.875A3.75 3.75 0 0 1 16.5 18v2.625c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625v-12Z" />
-                <path d="M10.5 10.5a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963 5.23 5.23 0 0 0-3.434-1.279h-1.875a.375.375 0 0 1-.375-.375V10.5Z" />
-              </svg>
-            </div>
-
-            <input
-              id='email-input '
-              type='text'
-              placeholder='input placeholder'
-              className={`flex-column text-align-top align-text-top text-wrap  rounded-2xl w-full h-48 border-blue-50 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'
-                }`}>
-            </input>
-          </div>
-
-        </div>
-      </div>
-      <CarouselDemo />
     </div>
   )
 }
