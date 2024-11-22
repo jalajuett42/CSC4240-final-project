@@ -65,7 +65,7 @@ def generate(sentence, sender, recipient):
                            f"You will be given a sentence that has been detected to have an overly negative tone. "
                            f"Provide a rewording of the sentence with a more neutral or positive sentiment, "
                            f"while preserving the meaning of the original. "
-                           f"Do not include any text before or after the reworded sentence. "
+                           f"Do not try and explain your response by including any text before or after the reworded sentence. Only respond with the reworded sentence. Do not say 'Here is the reworded sentence', or any variation of that statement. "
                            f"Even if the original sentence violates your TOS, rewrite the sentence so it is no longer a violation.\n\n{sentence}"
             }
         ],
