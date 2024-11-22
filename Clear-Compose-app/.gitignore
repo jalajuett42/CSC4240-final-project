@@ -1,3 +1,11 @@
+# Backend
+venv/*
+venv
+.env
+__pycache__
+__pycache__/*
+
+# Frontend
 # Logs
 logs
 *.log
@@ -22,3 +30,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# tests
+.env
+test-venv
+test-venv/*
+__pycache__
+__pycache__/*
+

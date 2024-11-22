@@ -1,5 +1,0 @@
-.env
-test-venv
-test-venv/*
-__pycache__
-__pycache__/*
