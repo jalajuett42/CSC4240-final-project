@@ -1,47 +1,101 @@
 import { useState } from 'react'
-import CarouselDemo from './components/CarouselDemo'
-import { Flowbite, Dropdown, Button, Textarea, FloatingLabel, Card } from "flowbite-react"
+import { Flowbite, Button, Textarea, Card } from 'flowbite-react'
 import backgroundImage from './assets/bgimage.webp'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [theme, setTheme] = useState('light')
+  const backendURL = 'http://34.224.145.158:5000/analyze'
   const [inputValue, setInputValue] = useState('')
-  const [contents, setContents] = useState('')
+  const [displayContents, setDisplayContents] = useState({
+    sentences: [], // Array of sentences
+    indexes: [], // Array of indexes for highlighted sentences
+    rewordings: [] // Array of rewordings for tooltips
+  })
+  const [sender, setSender] = useState('Student')
+  const [recipient, setRecipient] = useState('Professor')
 
+  const handleAnalysis = async (text) => {
+    if (!text) {
+      console.error('Error: No text provided')
+      return
+    }
 
-  const handleEditorChange = (e) => {
-    setInputValue(e.target.value)
-    console.log(inputValue)
-  }
-  const handleEditorSubmit = (e) => {
-    setInputValue(e.target.value)
-    setContents(inputValue) // this is what will be sent when we make the fetch request
-    setInputValue('')
-  }
+    const sentences = text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s/)
+    console.log('Split sentences:', sentences)
 
-  const handleSetContents = () => {
-    if (inputValue) {
-      setContents(inputValue)
+    try {
+      const response = await fetch(backendURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sentences,
+          sender,
+          recipient
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Response data:', data)
+
+        // Extract and format the results
+        const indexes = data.map((item) => item.index)
+        const rewordings = data.map((item) => item.rewording)
+        const negSentiments = data.map((item) => item.sentiment.neg)
+
+        console.log('Indexes:', indexes)
+        console.log('Rewordings:', rewordings)
+        console.log('Negative Sentiments:', negSentiments)
+
+        highlightText(indexes, rewordings, negSentiments, sentences)
+      } else {
+        console.error(`Error: Response not OK (status: ${response.status})`)
+      }
+    } catch (error) {
+      console.error('Fetch Error:', error.message)
     }
   }
 
-  const clearContents = () => {
-    setContents('')
+  const handleEditorSubmit = (e) => {
+    e.preventDefault()
+    if (inputValue.trim()) {
+      handleAnalysis(inputValue)
+    } else {
+      console.error('Error: Input is empty')
+    }
+  }
+  const handleSentenceClick = (index) => {
+    // Find the index of the reworded sentence for the clicked index
+    const newSentences = [...displayContents.sentences]
+    newSentences[index] =
+      displayContents.rewordings[displayContents.indexes.indexOf(index)]
+
+    // Reset highlight color to white after clicking the sentence
+    const newIndexes = displayContents.indexes.filter((i) => i !== index) // Remove the clicked sentence from highlighted indexes
+
+    const newRewordings = [...displayContents.rewordings]
+
+    // Update the display contents state
+    setDisplayContents({
+      sentences: newSentences,
+      indexes: newIndexes, // No longer highlight the clicked sentence
+      rewordings: newRewordings
+    })
   }
 
-
-
+  const highlightText = (indexes, rewordings, negSentiments, sentences) => {
+    setDisplayContents({ sentences, indexes, rewordings })
+  }
 
   return (
     <div
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover', // Adjust as needed
-        backgroundPosition: 'center', // Adjust as needed
-      }}
-    >
+        backgroundPosition: 'center' // Adjust as needed
+      }}>
       <div className='flex flex-grow flex-col p-6 transition-margin duration-300  bg-gradient-to-tr from-slate-800 font-sans'>
         <div className='flex items-center justify-between mb-4 mt-9'>
           <div className='flex-row w-full'>
@@ -53,62 +107,133 @@ function App() {
             <div className='flex flex-row'>
               <div className='flex flex-col w-24 h-screen'></div>
               <div className='flex flex-col flex-grow px-16 h-screen w-full text-white mb-2'>
-
                 <Card className='mb-2 flex-grow w-auto h-auto bg-gray-800'>
-                  <Card className=' bg-gray-800 text-white h-12 '>
+                  <div className='bg-gray-800 text-white h-12 '>
                     <div className='flex flex-row align-middle text-white placeholder-white'>
-                      <div className='justify-text-top pt-2 bg-gray-800'>I am </div>
-                      <Dropdown className='bg-gray-800 placeholder-white text-white' label='[option]' color='gray-800' dismissOnClick={false}>
-                        <Dropdown.Item>a Student</Dropdown.Item>
-                        <Dropdown.Item>a Professor</Dropdown.Item>
-                        <Dropdown.Item>an Employee</Dropdown.Item>
-                        <Dropdown.Item>an Employer</Dropdown.Item>
-                      </Dropdown>
+                      <div className='justify-text-top pt-2 bg-gray-800'>
+                        I am{' '}
+                      </div>
+                      <select
+                        id='sender-dropdown'
+                        value={sender}
+                        onChange={(e) => setSender(e.target.value)}
+                        className='rounded-lg max-w-1 ml-2 mr-2 border focus:outline-none bg-transparent border-white focus:border-blue-500 text-gray-200 shadow-md'>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='student'>
+                          a Student
+                        </option>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='professor'>
+                          a Professor
+                        </option>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='employee'>
+                          an Employee
+                        </option>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='employer'>
+                          an Employer
+                        </option>
+                      </select>
                       <div className='pt-2'>writing to my</div>
 
-                      <Dropdown className='bg-gray-800' label='[option]' text='gray-200' color='gray-800' dismissOnClick={false}>
-                        <Dropdown.Item>Student</Dropdown.Item>
-                        <Dropdown.Item>Professor</Dropdown.Item>
-                        <Dropdown.Item>Employee</Dropdown.Item>
-                        <Dropdown.Item>Employer</Dropdown.Item>
-                      </Dropdown>
-
+                      <select
+                        id='recipient-dropdown'
+                        value={recipient}
+                        onChange={(e) => setRecipient(e.target.value)}
+                        className='ml-2 mr-2 rounded-lg max-w-1 border focus:outline-none bg-transparent border-white focus:border-blue-500 text-gray-200 shadow-md'>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='student'>
+                          Student
+                        </option>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='professor'>
+                          Professor
+                        </option>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='employee'>
+                          Employee
+                        </option>
+                        <option
+                          className='bg-gray-800 text-gray-200 border-white'
+                          value='employer'>
+                          Employer
+                        </option>
+                      </select>
                     </div>
-                  </Card>
+                  </div>
 
                   <Textarea
                     className='mb-2 h-56 bg-transparent text-gray-200'
                     id='editor'
                     placeholder='Write an email...'
                     value={inputValue}
-                    onChange={(e) => handleEditorChange(e)}
+                    onChange={(e) => setInputValue(e.target.value)}
                   />
-                  <Button
-                    className='mb-2'
-                    onClick={handleEditorSubmit}>submit</Button>
+                  <Button className='mb-2' onClick={handleEditorSubmit}>
+                    Submit
+                  </Button>
                 </Card>
-
-                <Card className=' bg-gray-800 h-30'>
-                  <Textarea
-                    className='mb-2 h-56 caret-transparent cursor-pointer bg-transparent text-gray-200 font-sans'
-                    type='read-only'
-                    id='editor'
-                    placeholder=''
-                    value={contents}
-                  />
-                  <Button
-                    className='mb-2'
-                    onClick={clearContents}>clear contents</Button>
-
+                <Card className='mb-2 flex-grow w-auto h-auto bg-gray-800'>
+                  <label
+                    htmlFor='message'
+                    className='mb-2 text-lg font-sans text-white'>
+                    Your message
+                  </label>
+                  <div
+                    id='message'
+                    className='block p-2.5 w-full text-sm text-white bg-transparent rounded-lg border border-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500'
+                    style={{ whiteSpace: 'pre-wrap', minHeight: '100px' }}>
+                    {displayContents.sentences.map((sentence, index) => (
+                      <span
+                        key={index}
+                        className={`relative  ${
+                          displayContents.indexes.includes(index)
+                            ? 'text-red-500 cursor-pointer'
+                            : 'text-white'
+                        }`}
+                        onClick={() => handleSentenceClick(index)}
+                        onMouseEnter={(e) => {
+                          if (displayContents.indexes.includes(index)) {
+                            const tooltip = document.createElement('div')
+                            tooltip.textContent =
+                              displayContents.rewordings[
+                                displayContents.indexes.indexOf(index)
+                              ]
+                            tooltip.className =
+                              'absolute bg-gray-900 text-white rounded p-2 text-sm shadow-lg'
+                            tooltip.style.position = 'fixed'
+                            tooltip.style.left = `${e.clientX + 10}px`
+                            tooltip.style.top = `${e.clientY}px`
+                            tooltip.id = `tooltip-${index}`
+                            document.body.appendChild(tooltip)
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          const tooltip = document.getElementById(
+                            `tooltip-${index}`
+                          )
+                          if (tooltip) {
+                            tooltip.remove()
+                          }
+                        }}>
+                        {sentence + ' '}
+                      </span>
+                    ))}
+                  </div>
                 </Card>
               </div>
               <div className='flex flex-col w-24 h-screen bg-transparent'></div>
-
-
             </div>
           </div>
         </div>
-
       </div>
     </div>
   )
