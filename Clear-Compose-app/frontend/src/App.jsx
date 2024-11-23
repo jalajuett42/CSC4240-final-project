@@ -196,7 +196,7 @@ function App() {
                         key={index}
                         className={`relative  ${
                           displayContents.indexes.includes(index)
-                            ? 'text-red-500 cursor-pointer'
+                            ? 'text-red-600 cursor-pointer rounded-sm bg-red-200 bg-opacity-75'
                             : 'text-white'
                         }`}
                         onClick={() => handleSentenceClick(index)}
