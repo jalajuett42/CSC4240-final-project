@@ -60,6 +60,19 @@ The final project grade will be distributed as follows:
 4. resolve conflicts
 5. delete your branch and repeat steps 1-5
 
-### Ideas
-1. Perform sentiment analysis to help reciever interpret the tone of an email
-2. Perform sentiment analysis to help sender write an email with appropriate tone/ make suggestions
+### How to run web application
+1) clone the repository
+2) run the following commands:
+```bash
+cd .\CSC4240-final-project\Clear-Compose-app\frontend\
+npm i
+npm run dev
+```
+3) open http://localhost:5173 in a chrome browser
+### Usage
+1) Select sender and recipient from the dropdown menus
+2) copy and paste an email into the text area
+3) click the 'submit' button
+4) hover highlighted text and click to replace sentences with the rephrased sentences from the LLM.
+
+
