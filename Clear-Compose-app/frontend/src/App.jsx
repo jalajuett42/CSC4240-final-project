@@ -13,6 +13,7 @@ function App() {
   })
   const [sender, setSender] = useState('Student')
   const [recipient, setRecipient] = useState('Professor')
+  const [clickedIndexes, setClickedIndexes] = useState([]) // Track clicked indexes
 
   const handleAnalysis = async (text) => {
     if (!text) {
@@ -60,14 +61,18 @@ function App() {
 
   const handleEditorSubmit = (e) => {
     e.preventDefault()
+    setClickedIndexes([]) // R
     if (inputValue.trim()) {
       handleAnalysis(inputValue)
     } else {
       console.error('Error: Input is empty')
     }
   }
+
   const handleSentenceClick = (index) => {
-    // Find the index of the reworded sentence for the clicked index
+    // If sentence is already clicked, do nothing
+    if (clickedIndexes.includes(index)) return
+
     const newSentences = [...displayContents.sentences]
     newSentences[index] =
       displayContents.rewordings[displayContents.indexes.indexOf(index)]
@@ -76,6 +81,9 @@ function App() {
     const newIndexes = displayContents.indexes.filter((i) => i !== index) // Remove the clicked sentence from highlighted indexes
 
     const newRewordings = [...displayContents.rewordings]
+
+    // Update the clicked indexes state
+    setClickedIndexes((prevState) => [...prevState, index])
 
     // Update the display contents state
     setDisplayContents({
@@ -96,10 +104,10 @@ function App() {
         backgroundSize: 'cover', // Adjust as needed
         backgroundPosition: 'center' // Adjust as needed
       }}>
-      <div className='flex flex-grow flex-col p-6 transition-margin duration-300  bg-gradient-to-tr from-slate-800 font-sans'>
+      <div className='flex flex-grow flex-col p-6 transition-margin duration-300 bg-gradient-to-tr from-slate-800 font-sans'>
         <div className='flex items-center justify-between mb-4 mt-9'>
           <div className='flex-row w-full'>
-            <div className='flex flex-col  '>
+            <div className='flex flex-col'>
               <h2 className='font-bold font-sans text-blue-100 text-4xl ml-5 pr-8 mb-8'>
                 Clear Compose
               </h2>
@@ -108,7 +116,7 @@ function App() {
               <div className='flex flex-col w-24 h-screen'></div>
               <div className='flex flex-col flex-grow px-16 h-screen w-full text-white mb-2'>
                 <Card className='mb-2 flex-grow w-auto h-auto bg-gray-800'>
-                  <div className='bg-gray-800 text-white h-12 '>
+                  <div className='bg-gray-800 text-white h-12'>
                     <div className='flex flex-row align-middle text-white placeholder-white'>
                       <div className='justify-text-top pt-2 bg-gray-800'>
                         I am{' '}
@@ -182,11 +190,6 @@ function App() {
                   </Button>
                 </Card>
                 <Card className='mb-2 flex-grow w-auto h-auto bg-gray-800'>
-                  <label
-                    htmlFor='message'
-                    className='mb-2 text-lg font-sans text-white'>
-                    Your message
-                  </label>
                   <div
                     id='message'
                     className='block p-2.5 w-full text-sm text-white bg-transparent rounded-lg border border-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500'
@@ -194,9 +197,11 @@ function App() {
                     {displayContents.sentences.map((sentence, index) => (
                       <span
                         key={index}
-                        className={`relative  ${
-                          displayContents.indexes.includes(index)
-                            ? 'text-red-500 cursor-pointer'
+                        className={`relative ${
+                          clickedIndexes.includes(index)
+                            ? 'text-green-200 cursor-pointer rounded-sm'
+                            : displayContents.indexes.includes(index)
+                            ? 'text-red-600 cursor-pointer rounded-sm bg-red-200 bg-opacity-90'
                             : 'text-white'
                         }`}
                         onClick={() => handleSentenceClick(index)}
