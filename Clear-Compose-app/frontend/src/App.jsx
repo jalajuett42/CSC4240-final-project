@@ -15,19 +15,6 @@ function App() {
   const [recipient, setRecipient] = useState('Professor')
   const [clickedIndexes, setClickedIndexes] = useState([]) // Track clicked indexes
 
-  const startTypingEffect = (text) => {
-    setIsTyping(true)
-    let index = 0
-    const typingInterval = setInterval(() => {
-      setTypedText((prevText) => prevText + text[index])
-      index += 1
-      if (index === text.length) {
-        clearInterval(typingInterval)
-        setIsTyping(false)
-      }
-    }, 100) // Adjust the typing speed here
-  }
-
   const handleAnalysis = async (text) => {
     if (!text) {
       console.error('Error: No text provided')
@@ -74,7 +61,7 @@ function App() {
 
   const handleEditorSubmit = (e) => {
     e.preventDefault()
-    setClickedIndexes([]) // Reset clicked indexes
+    setClickedIndexes([]) // R
     if (inputValue.trim()) {
       handleAnalysis(inputValue)
     } else {
