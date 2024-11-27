@@ -10,6 +10,10 @@ Clear Compose is an intelligent email editor that helps users craft well-balance
 4. resolve conflicts
 5. delete your branch and repeat steps 1-5
 
+### Requirements:
+- Node
+- Chrome Browser
+
 ### How to run web application
 1) clone the repository
 2) run the following commands:
