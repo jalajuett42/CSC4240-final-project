@@ -70,27 +70,35 @@ function App() {
   }
 
   const handleSentenceClick = (index) => {
-    // If sentence is already clicked, do nothing
+    // If the sentence is already clicked, do nothing
     if (clickedIndexes.includes(index)) return
 
-    const newSentences = [...displayContents.sentences]
-    newSentences[index] =
-      displayContents.rewordings[displayContents.indexes.indexOf(index)]
+    // Find the rewording for the clicked sentence
+    const rewordIndex = displayContents.indexes.indexOf(index)
 
-    // Reset highlight color to white after clicking the sentence
-    const newIndexes = displayContents.indexes.filter((i) => i !== index) // Remove the clicked sentence from highlighted indexes
+    // If the index is valid, perform the replacement
+    if (rewordIndex !== -1) {
+      const newSentences = [...displayContents.sentences]
+      const newIndexes = [...displayContents.indexes]
+      const newRewordings = [...displayContents.rewordings]
 
-    const newRewordings = [...displayContents.rewordings]
+      // Replace the sentence with its rewording
+      newSentences[index] = displayContents.rewordings[rewordIndex]
 
-    // Update the clicked indexes state
-    setClickedIndexes((prevState) => [...prevState, index])
+      // Remove the clicked sentence from highlighted indexes and rewordings
+      newIndexes.splice(rewordIndex, 1)
+      newRewordings.splice(rewordIndex, 1)
 
-    // Update the display contents state
-    setDisplayContents({
-      sentences: newSentences,
-      indexes: newIndexes, // No longer highlight the clicked sentence
-      rewordings: newRewordings
-    })
+      // Update the clicked indexes state
+      setClickedIndexes((prevState) => [...prevState, index])
+
+      // Update the display contents state
+      setDisplayContents({
+        sentences: newSentences,
+        indexes: newIndexes,
+        rewordings: newRewordings
+      })
+    }
   }
 
   const highlightText = (indexes, rewordings, negSentiments, sentences) => {
@@ -212,6 +220,7 @@ function App() {
                               displayContents.rewordings[
                                 displayContents.indexes.indexOf(index)
                               ]
+
                             tooltip.className =
                               'absolute bg-gray-900 text-white rounded p-2 text-sm shadow-lg'
                             tooltip.style.position = 'fixed'
