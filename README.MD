@@ -1,4 +1,4 @@
-#Clear Compose
+# Clear Compose
 ### Description
 Clear Compose is an intelligent email editor that helps users craft well-balanced, professional emails by analyzing and suggesting tone adjustments. Built with a modern tech stack, Clear compose combines a sleek ReactJSX frontend styled with TailwindCSS and a robust Python Flask backend for powerful sentiment analysis and tone-enhancing suggestions.
 - Integrates the VADER Sentiment Analysis tool to analyze the tone of the email, identifying positive, neutral, or negative sentiments, for selecting individual sentences to be rephrased or adjusted and highlighted that contribute negatively to the tone of the email.
